@@ -3,7 +3,11 @@
 // Import required modules
 const express = require('express');
 const bodyParser = require('body-parser');
-const { v4: uuidv4 } = require('uuid');
+const productRoutes = require('./routes/products');
+const logger = require('./middleware/logger'); // Correct path to logger.js
+const auth = require('./middleware/auth'); // Correct path to auth.js
+const validateProduct = require('./middleware/validateProduct'); // Correct path to validateProduct.js
+const errorHandler = require('./middleware/errorHandler'); // Correct path to errorHandler.js
 
 // Initialize Express app
 const app = express();
@@ -11,6 +15,10 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware setup
 app.use(bodyParser.json());
+
+app.use(logger);
+app.use(auth);
+
 
 // Sample in-memory products database
 let products = [
@@ -40,32 +48,42 @@ let products = [
   }
 ];
 
+
 // Root route
 app.get('/', (req, res) => {
-  res.send('Welcome to the Product API! Go to /api/products to see all products.');
+  res.send('Hello World');
 });
 
-// TODO: Implement the following routes:
 // GET /api/products - Get all products
 // GET /api/products/:id - Get a specific product
 // POST /api/products - Create a new product
 // PUT /api/products/:id - Update a product
 // DELETE /api/products/:id - Delete a product
 
-// Example route implementation for GET /api/products
-app.get('/api/products', (req, res) => {
-  res.json(products);
-});
 
 // TODO: Implement custom middleware for:
 // - Request logging
 // - Authentication
 // - Error handling
 
+
+// Middleware setup
+app.use(bodyParser.json());
+app.use(logger);
+app.use(auth);
+
+// Routes
+app.use('/api/products', productRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
+
 // Export the app for testing purposes
-module.exports = app; 
+module.exports = app;
+
